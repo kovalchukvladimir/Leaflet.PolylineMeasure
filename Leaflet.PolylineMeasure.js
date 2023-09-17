@@ -1044,6 +1044,10 @@
         },
 
         _clickedArrow: function(e) {
+            if (this._currentLine || this._resumeFirstpointFlag) {
+                // ignore event
+                return
+            }
             if (e.originalEvent.ctrlKey || e.originalEvent.metaKey) {  // (metaKey for Mac)
                 var lineNr = e.target.cntLine;
                 var arrowNr = e.target.cntArrow;
@@ -1227,6 +1231,11 @@
 
         // not just used for dragging Cirles but also for deleting circles and resuming line at its starting point.
         _dragCircle: function (e1) {
+            if (this._currentLine || this._resumeFirstpointFlag) {
+                // ignore event
+                return
+            }
+
             var arcpoints = this._arcpoints;
             if (e1.originalEvent.ctrlKey || e1.originalEvent.metaKey) {   // if user wants to resume drawing a line. metaKey for Mac
                 this._map.off ('click', this._mouseClick, this); // to avoid unwanted creation of a new line if CTRL-clicked onto a point

@@ -1013,6 +1013,10 @@
          * @private
          */
         _resumePolylinePath: function (e) {
+            if (this._currentLine || this._resumeFirstpointFlag) {
+                // ignore event while editing a line
+                return
+            }
             if (e.originalEvent.ctrlKey === true || e.originalEvent.metaKey === true) {    // just resume if user pressed the CTRL-Key (or metaKey on Mac) while clicking onto the last circle
                 this._currentLine = this._arrPolylines [e.target.cntLine];
                 this._rubberlinePath = L.polyline ([], {
@@ -1045,7 +1049,7 @@
 
         _clickedArrow: function(e) {
             if (this._currentLine || this._resumeFirstpointFlag) {
-                // ignore event
+                // ignore event while editing a line
                 return
             }
             if (e.originalEvent.ctrlKey || e.originalEvent.metaKey) {  // (metaKey for Mac)
@@ -1197,6 +1201,14 @@
         },
 
         _resumeFirstpointClick: function (e) {
+            if ((this._resumeFirstpointFlag || this._currentLine) && this._lastCircleCoords) {
+                // Check when the user pressed on circle
+                const distance = this._lastCircleCoords.distanceTo(e.latlng)
+                if (distance === 0) {
+                    return
+                }
+            }
+
             var lineNr = this._lineNr;
             this._resumeFirstpointFlag = false;
             this._map.off ('mousemove', this._resumeFirstpointMousemove, this);
@@ -1232,7 +1244,8 @@
         // not just used for dragging Cirles but also for deleting circles and resuming line at its starting point.
         _dragCircle: function (e1) {
             if (this._currentLine || this._resumeFirstpointFlag) {
-                // ignore event
+                // ignore event while editing a line
+                this._lastCircleCoords = e1.latlng
                 return
             }
 

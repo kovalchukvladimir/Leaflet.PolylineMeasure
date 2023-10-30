@@ -1013,8 +1013,8 @@
          * @private
          */
         _resumePolylinePath: function (e) {
-            if (this._currentLine || this._resumeFirstpointFlag) {
-                // ignore event while editing a line
+            if (!this._measuring || this._currentLine || this._resumeFirstpointFlag) {
+                // ignore event while editing a line or measuring is disabled
                 return
             }
             if (e.originalEvent.ctrlKey === true || e.originalEvent.metaKey === true) {    // just resume if user pressed the CTRL-Key (or metaKey on Mac) while clicking onto the last circle
@@ -1048,8 +1048,8 @@
         },
 
         _clickedArrow: function(e) {
-            if (this._currentLine || this._resumeFirstpointFlag) {
-                // ignore event while editing a line
+            if (!this._measuring || this._currentLine || this._resumeFirstpointFlag) {
+                // ignore event while editing a line or measuring is disabled
                 return
             }
             if (e.originalEvent.ctrlKey || e.originalEvent.metaKey) {  // (metaKey for Mac)
@@ -1243,6 +1243,10 @@
 
         // not just used for dragging Cirles but also for deleting circles and resuming line at its starting point.
         _dragCircle: function (e1) {
+            if (!this._measuring) {
+                // ignore event while measuring is disabled
+                return
+            }
             if (this._currentLine || this._resumeFirstpointFlag) {
                 // ignore event while editing a line
                 this._lastCircleCoords = e1.latlng

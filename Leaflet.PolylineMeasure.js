@@ -1127,13 +1127,77 @@
             }
         },
 
-        _dragCircleMouseup: function () {
+        _hideArrows: function () {
+            this._arrPolylines.forEach((polyline, index) => {
+                polyline.arrowMarkers.forEach((arrowMarker) => {
+                    const arrowPoint = this._map.latLngToLayerPoint(arrowMarker?._latlng) 
+                    let found = false
+                    if (arrowPoint) {
+                        for (let circlePolylineIndex = 0; circlePolylineIndex < this._arrPolylines.length; circlePolylineIndex++) {
+                            const circlePolyline = this._arrPolylines[circlePolylineIndex]
+                            if (index !== circlePolylineIndex) {
+                                for (let circle of circlePolyline.circleMarkers) {
+                                    const circlePoint = circle._point
+                                    const distance = Math.sqrt(Math.pow(circlePoint.x - arrowPoint.x, 2) + Math.pow(circlePoint.y - arrowPoint.y, 2));
+                                    if (distance < this.options.currentCircle.radius * 3) {
+                                        if (!this._removedLayers) {
+                                            this._removedLayers = []
+                                        }
+                                        this._removedLayers.push(arrowMarker)
+                                        this._map.removeLayer(arrowMarker)
+                                        found = true
+                                        break
+                                    }
+                                }
+                            }
+                            if (found) {
+                                break
+                            }
+                        }            
+                    }
+                })
+            })
+        },
+
+        _restoreArrows: function (eStart, eEnd) {
+            if (this._removedLayers && eStart && eEnd) {
+                const pointStart = eStart.layerPoint
+                const pointEnd = eEnd.layerPoint
+                const radius = this.options.currentCircle.radius * 2
+                let i = this._removedLayers.length
+                while(i--) {
+                    const arrowMarker = this._removedLayers[i]
+                    const p2Point = arrowMarker?._latlng
+                    if (p2Point) {
+                        const p2 = this._map.latLngToLayerPoint(p2Point)
+                        const distanceStart = Math.sqrt(Math.pow(pointStart.x - p2.x, 2) + Math.pow(pointStart.y - p2.y, 2));
+                        const distanceEnd = Math.sqrt(Math.pow(pointEnd.x - p2.x, 2) + Math.pow(pointEnd.y - p2.y, 2));
+                        if (distanceStart < radius && distanceEnd >= radius) {
+                            const id = arrowMarker._leaflet_id
+                            const foundIndex = this._arrPolylines.findIndex((polyline) => {
+                                return polyline.arrowMarkers.findIndex((marker) => {
+                                    return marker._leaflet_id === id
+                                }) >= 0
+                            })
+                            if (foundIndex >= 0) {
+                                arrowMarker.addTo(this._layerPaint)
+                            }
+                            this._removedLayers.splice(i, 1)
+                        }
+                    }    
+                }
+            }
+        },
+
+        _dragCircleMouseup: function (e) {
             // bind new popup-tooltip to the last CircleMArker if dragging finished
             if ((this._circleNr === 0) || (this._circleNr === this._arrPolylines[this._lineNr].circleCoords.length-1)) {
                this._e1.target.bindTooltip (this.options.tooltipTextMove + this.options.tooltipTextDelete + this.options.tooltipTextResume, {direction:'top', opacity:0.7, className:'polyline-measure-popupTooltip'});
             } else {
                this._e1.target.bindTooltip (this.options.tooltipTextMove + this.options.tooltipTextDelete, {direction:'top', opacity:0.7, className:'polyline-measure-popupTooltip'});
             }
+            this._restoreArrows(this._e1, e);
+            this._hideArrows();
             this._resetPathVariables();
             this._map.off ('mousemove', this._dragCircleMousemove, this);
             this._map.dragging.enable();

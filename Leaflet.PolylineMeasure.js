@@ -1135,19 +1135,17 @@
                     if (arrowPoint) {
                         for (let circlePolylineIndex = 0; circlePolylineIndex < this._arrPolylines.length; circlePolylineIndex++) {
                             const circlePolyline = this._arrPolylines[circlePolylineIndex]
-                            if (index !== circlePolylineIndex) {
-                                for (let circle of circlePolyline.circleMarkers) {
-                                    const circlePoint = circle._point
-                                    const distance = Math.sqrt(Math.pow(circlePoint.x - arrowPoint.x, 2) + Math.pow(circlePoint.y - arrowPoint.y, 2));
-                                    if (distance < this.options.currentCircle.radius * 3) {
-                                        if (!this._removedLayers) {
-                                            this._removedLayers = []
-                                        }
-                                        this._removedLayers.push(arrowMarker)
-                                        this._map.removeLayer(arrowMarker)
-                                        found = true
-                                        break
+                            for (let circle of circlePolyline.circleMarkers) {
+                                const circlePoint = circle._point
+                                const distance = Math.sqrt(Math.pow(circlePoint.x - arrowPoint.x, 2) + Math.pow(circlePoint.y - arrowPoint.y, 2));
+                                if (distance < this.options.currentCircle.radius * 3) {
+                                    if (!this._removedLayers) {
+                                        this._removedLayers = []
                                     }
+                                    this._removedLayers.push(arrowMarker)
+                                    this._map.removeLayer(arrowMarker)
+                                    found = true
+                                    break
                                 }
                             }
                             if (found) {

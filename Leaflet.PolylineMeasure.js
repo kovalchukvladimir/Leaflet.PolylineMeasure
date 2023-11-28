@@ -1073,6 +1073,15 @@
         _clickedArrow: function(e) {
             if (!this._measuring || this._currentLine || this._resumeFirstpointFlag) {
                 // ignore event while editing a line or measuring is disabled
+                // or if resuming a line at its first point is active
+                if (this._currentLine || this._resumeFirstpointFlag) {
+                    if (this._currentLine) {
+                        this._mouseClick(e)
+                    } else if (this._resumeFirstpointFlag) {
+                        this._resumeFirstpointClick(e)
+                    }
+                    this._hideArrows(e?.layerPoint)
+                }
                 return
             }
             if (e.originalEvent.ctrlKey || e.originalEvent.metaKey) {  // (metaKey for Mac)
@@ -1127,31 +1136,41 @@
             }
         },
 
-        _hideArrows: function () {
+        _hideArrows: function (point) {
             this._arrPolylines.forEach((polyline, index) => {
                 polyline.arrowMarkers.forEach((arrowMarker) => {
                     const arrowPoint = this._map.latLngToLayerPoint(arrowMarker?._latlng) 
                     let found = false
                     if (arrowPoint) {
-                        for (let circlePolylineIndex = 0; circlePolylineIndex < this._arrPolylines.length; circlePolylineIndex++) {
-                            const circlePolyline = this._arrPolylines[circlePolylineIndex]
-                            for (let circle of circlePolyline.circleMarkers) {
-                                const circlePoint = circle._point
-                                const distance = Math.sqrt(Math.pow(circlePoint.x - arrowPoint.x, 2) + Math.pow(circlePoint.y - arrowPoint.y, 2));
-                                if (distance < this.options.currentCircle.radius * 3) {
-                                    if (!this._removedLayers) {
-                                        this._removedLayers = []
+                        if (point) {
+                            const distance = Math.sqrt(Math.pow(point.x - arrowPoint.x, 2) + Math.pow(point.y - arrowPoint.y, 2));
+                            if (distance < this.options.currentCircle.radius * 3) {
+                                found = true
+                            }
+                        }
+                        if (!found) {
+                            for (let circlePolylineIndex = 0; circlePolylineIndex < this._arrPolylines.length; circlePolylineIndex++) {
+                                const circlePolyline = this._arrPolylines[circlePolylineIndex]
+                                for (let circle of circlePolyline.circleMarkers) {
+                                    const circlePoint = circle._point
+                                    const distance = Math.sqrt(Math.pow(circlePoint.x - arrowPoint.x, 2) + Math.pow(circlePoint.y - arrowPoint.y, 2));
+                                    if (distance < this.options.currentCircle.radius * 3) {
+                                        found = true
+                                        break
                                     }
-                                    this._removedLayers.push(arrowMarker)
-                                    this._map.removeLayer(arrowMarker)
-                                    found = true
+                                }
+                                if (found) {
                                     break
                                 }
-                            }
-                            if (found) {
-                                break
-                            }
-                        }            
+                            }     
+                        }       
+                    }
+                    if (found) {
+                        if (!this._removedLayers) {
+                            this._removedLayers = []
+                        }
+                        this._removedLayers.push(arrowMarker)
+                        this._map.removeLayer(arrowMarker)
                     }
                 })
             })

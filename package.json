@@ -1,6 +1,6 @@
 {
   "name": "@kvforks/leaflet.polylinemeasure",
-  "version": "3.0.0-rc.7",
+  "version": "3.0.0-rc.8",
   "description": "Leaflet Plugin to measure distances of simple lines as well as of complex polylines",
   "main": "Leaflet.PolylineMeasure.js",
   "scripts": {

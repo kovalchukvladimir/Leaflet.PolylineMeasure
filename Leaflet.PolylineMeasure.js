@@ -1176,30 +1176,40 @@
             })
         },
 
-        _restoreArrows: function (eStart, eEnd) {
-            if (this._removedLayers && eStart && eEnd) {
-                const pointStart = eStart.layerPoint
+        _restoreArrows: function (eEnd, remove) {
+            // Restore arrows if they are not in the radius of the last circle
+
+            const doRestore = (index) => {
+                const arrowMarker = this._removedLayers[index]
+                const id = arrowMarker._leaflet_id
+                const foundIndex = this._arrPolylines.findIndex((polyline) => {
+                    return polyline.arrowMarkers.findIndex((marker) => {
+                        return marker._leaflet_id === id
+                    }) >= 0
+                })
+                if (foundIndex >= 0) {
+                    arrowMarker.addTo(this._layerPaint)
+                }
+                this._removedLayers.splice(index, 1)
+            }
+
+            if (this._removedLayers && eEnd) {
                 const pointEnd = eEnd.layerPoint
                 const radius = this.options.currentCircle.radius * 2
                 let i = this._removedLayers.length
                 while(i--) {
-                    const arrowMarker = this._removedLayers[i]
-                    const p2Point = arrowMarker?._latlng
+                    const p2Point = this._removedLayers[i]?._latlng
                     if (p2Point) {
                         const p2 = this._map.latLngToLayerPoint(p2Point)
-                        const distanceStart = Math.sqrt(Math.pow(pointStart.x - p2.x, 2) + Math.pow(pointStart.y - p2.y, 2));
                         const distanceEnd = Math.sqrt(Math.pow(pointEnd.x - p2.x, 2) + Math.pow(pointEnd.y - p2.y, 2));
-                        if (distanceStart < radius && distanceEnd >= radius) {
-                            const id = arrowMarker._leaflet_id
-                            const foundIndex = this._arrPolylines.findIndex((polyline) => {
-                                return polyline.arrowMarkers.findIndex((marker) => {
-                                    return marker._leaflet_id === id
-                                }) >= 0
-                            })
-                            if (foundIndex >= 0) {
-                                arrowMarker.addTo(this._layerPaint)
+                        if (remove) {
+                            if (distanceEnd < radius) {
+                                doRestore(i)
                             }
-                            this._removedLayers.splice(i, 1)
+                        } else {
+                            if (distanceEnd >= radius) {
+                                doRestore(i)
+                            }
                         }
                     }    
                 }
@@ -1213,7 +1223,7 @@
             } else {
                this._e1.target.bindTooltip (this.options.tooltipTextMove + this.options.tooltipTextDelete, {direction:'top', opacity:0.7, className:'polyline-measure-popupTooltip'});
             }
-            this._restoreArrows(this._e1, e);
+            this._restoreArrows(e);
             this._hideArrows();
             this._resetPathVariables();
             this._map.off ('mousemove', this._dragCircleMousemove, this);
@@ -1494,6 +1504,7 @@
                       this._layerPaint.removeLayer (this._arrPolylines[lineNr].tooltips [0]);
                       this._layerPaint.removeLayer (this._arrPolylines[lineNr].arrowMarkers [0]);
                       this._layerPaint.removeLayer (this._arrPolylines[lineNr].polylinePath);
+                      this._restoreArrows(e1, true);
                       this._map.fire('polylinemeasure:remove', e1);
                       this._map.fire('polylinemeasure:change', this._arrPolylines[this._lineNr]);
                       return;
@@ -1576,6 +1587,7 @@
                 // if user is deleting a point of a line not finished yet (= rubbberline still present)
                 } 
 
+                this._restoreArrows(e1, true);
                 this._map.fire('polylinemeasure:remove', e1);
                 this._map.fire('polylinemeasure:change', this._arrPolylines[this._lineNr]);
                 return;

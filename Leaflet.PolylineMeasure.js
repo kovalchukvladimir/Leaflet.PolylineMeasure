@@ -869,6 +869,9 @@
             var last = function() {
                 return this.slice(-1)[0];
             };
+            var first = function() {
+                return this.slice()[0];
+            };
             this._rubberlinePath = L.polyline ([], {
                 // Style of temporary, dashed line while moving the mouse
                 color: this.options.tempLine.color,
@@ -966,6 +969,7 @@
                     polylineState._layerPaint.removeLayer (polylineState._rubberlinePath);
                     if (this.circleCoords.length > 1) {
                         this.tooltips.last()._icon.classList.add('polyline-measure-tooltip-end'); // add Class e.g. another background-color to the Previous Tooltip (which is the last fixed tooltip, cause the moving tooltip is being deleted later)
+                        this.tooltips.first()._icon.classList.add('polyline-measure-tooltip-start'); 
                         var lastCircleMarker = this.circleMarkers.last()
                         lastCircleMarker.setStyle (polylineState.options.endCircle);
                         // use Leaflet's own tooltip method to shwo a popuo tooltip if user hovers the last circle of a polyline
@@ -1002,6 +1006,7 @@
             this._currentLine.tooltips.push (firstTooltip);
             this._currentLine.circleCoords.last = last;
             this._currentLine.tooltips.last = last;
+            this._currentLine.tooltips.first = first;
             this._currentLine.circleMarkers.last = last;
             this._currentLine.id = this._arrPolylines.length;
         },
@@ -1062,6 +1067,7 @@
                     dashArray: '8,8'
                 }).addTo(this._layerPaint).bringToBack();
                 this._currentLine.tooltips.last()._icon.classList.remove ('polyline-measure-tooltip-end');   // remove extra CSS-class of previous, last tooltip
+                this._currentLine.tooltips.first()._icon.classList.remove ('polyline-measure-tooltip-start');   // remove extra CSS-class of previous, last tooltip
                 var tooltipNew = this._currentLine.getNewToolTip (e.latlng);
                 tooltipNew.addTo (this._layerPaint);
                 this._currentLine.tooltips.push(tooltipNew);
@@ -1362,6 +1368,7 @@
             });
             arc.pop();  // remove last coordinate of arc, cause it's already part of the next arc.
             this._arrPolylines[lineNr].polylinePath.setLatLngs (arc.concat(this._arrPolylines[lineNr].polylinePath.getLatLngs()));
+            this._tooltipNew._icon.classList.add ('polyline-measure-tooltip-start');
             this._arrPolylines[lineNr].tooltips.unshift(this._tooltipNew);
             this._map.on ('mousemove', this._mouseMove, this);
         },
@@ -1387,6 +1394,8 @@
                     this._resumeFirstpointFlag = true;
                     this._lineNr = e1.target.cntLine;
                     var lineNr = this._lineNr;
+                    // Remove prev tooltip
+                    this._arrPolylines[lineNr].tooltips [0]._icon.classList.remove ('polyline-measure-tooltip-start');
                     this._circleNr = e1.target.cntCircle;
                     currentCircleCoords = e1.latlng;
                     this._arrPolylines[lineNr].circleMarkers [0].setStyle (this.options.currentCircle);
@@ -1564,6 +1573,7 @@
                         text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
                         text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
                         this._arrPolylines[lineNr].tooltips [0]._icon.innerHTML = text;
+                        this._arrPolylines[lineNr].tooltips [0]._icon.classList.add ('polyline-measure-tooltip-start');
                         // if last Circle is being removed
                     } else if (circleNr === this._arrPolylines[lineNr].circleCoords.length) {
                         this._arrPolylines[lineNr].circleMarkers [circleNr-1].on ('click', this._resumePolylinePath, this);

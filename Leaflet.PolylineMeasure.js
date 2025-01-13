@@ -79,6 +79,12 @@
              */
             bearingTextOut: 'Out',
              /**
+             * Show reverse angle (360 - angle) for bearing Out
+             * @type {Boolean}
+             * @default
+             */
+            showBearingOutReverse: false,
+             /**
              * Text for last point's tooltip
              * @type {String}
              * @default
@@ -757,6 +763,9 @@
 
             var angleIn = calcAngle (mouseCoords, lastCircleCoords, "inbound");
             var angleOut = calcAngle (lastCircleCoords, mouseCoords, "outbound");
+            if (this.options.showBearingOutReverse) {
+                angleOut = 360 - angleOut;
+            }
             var totalRound = this._getDistance (total);
             var differenceRound = this._getDistance (difference);
             var textCurrent = '';

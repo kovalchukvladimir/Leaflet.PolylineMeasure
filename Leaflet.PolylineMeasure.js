@@ -593,7 +593,8 @@
                     var text = '';
                     var totalDistance = 0;
                     if (this.options.showBearings === true) {
-                        text = this.options.bearingTextIn+':---°<br>'+this.options.bearingTextOut+':---°';
+                        text = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ':---°</div>'
+                        text += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
                     }
                     text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
                     text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
@@ -771,7 +772,8 @@
             var textCurrent = '';
             if (differenceRound.value > 0 ) {
                 if (this.options.showBearings === true) {
-                     textCurrent = this.options.bearingTextIn + ': ' + angleIn + '°<br>'+this.options.bearingTextOut+':---°';
+                     textCurrent = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ': ' + angleIn + '°</div>'
+                     textCurrent += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
                 }
                 textCurrent += '<div class="polyline-measure-tooltip-difference">+' + differenceRound.value + '&nbsp;' +  differenceRound.unit + '</div>';
             }
@@ -991,7 +993,8 @@
             firstTooltip.addTo(this._layerPaint);
             var text = '';
             if (this.options.showBearings === true) {
-                text = this.options.bearingTextIn+':---°<br>'+this.options.bearingTextOut+':---°';
+                text = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ':---°</div>'
+                text += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
             }
             text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
             text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
@@ -1404,7 +1407,8 @@
                     this._tooltipNew.addTo(this._layerPaint);
                     var text='';
                     if (this.options.showBearings === true) {
-                        text = text + this.options.bearingTextIn+':---°<br>'+this.options.bearingTextOut+':---°';
+                        text = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ':---°</div>'
+                        text += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
                     }
                     text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
                     text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
@@ -1455,7 +1459,8 @@
                         this._currentLine.arrowMarkers.splice(0,1);
                         var text='';
                         if (this.options.showBearings === true) {
-                            text = this.options.bearingTextIn+':---°<br>'+this.options.bearingTextOut+':---°';
+                            text = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ':---°</div>'
+                            text += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
                         }
                         text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
                         text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
@@ -1553,7 +1558,8 @@
                         this._arrPolylines[lineNr].arrowMarkers.splice(0,1);
                         var text='';
                         if (this.options.showBearings === true) {
-                            text = this.options.bearingTextIn+':---°<br>'+this.options.bearingTextOut+':---°';
+                            text = '<div class="polyline-measure-tooltip-bearings-in">' + this.options.bearingTextIn + ':---°</div>'
+                            text += '<div class="polyline-measure-tooltip-bearings-out">' + this.options.bearingTextOut+':---°</div>';
                         }
                         text = text + '<div class="polyline-measure-tooltip-difference">+' + '0</div>';
                         text = text + '<div class="polyline-measure-tooltip-total">' + '0</div>';
